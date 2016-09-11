@@ -5,12 +5,14 @@ from rss.models import Rss, RssItem, RssCategory
 
 @admin.register(Rss)
 class RssAdmin(admin.ModelAdmin):
-    pass
+
+    list_display = ['name', 'url', 'created', 'updated']
 
 
 @admin.register(RssItem)
 class RssItemAdmin(admin.ModelAdmin):
-    pass
+
+    list_display = ['name', 'url', 'published']
 
 
 @admin.register(RssCategory)

@@ -31,7 +31,7 @@ class RssCategory(RssBase):
 
 class Rss(RssBase):
 
-    user = models.ForeignKey(User)
+    user = models.ManyToManyField(User, blank=True)
     type = models.CharField(max_length=32, choices=RSS_TYPE_CHOICES)
     rsscategory = models.ForeignKey(RssCategory, null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=255)
@@ -39,12 +39,21 @@ class Rss(RssBase):
     image = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
+    def __unicode__(self):
+        return '<RSS {}:{}>'.format(self.id, self.name)
+
 
 class RssItem(RssBase):
 
-    user = models.ForeignKey(User)
     rss = models.ForeignKey(Rss)
     name = models.CharField(max_length=255)
-    unique_id = models.CharField(max_length=255)
+    unique_id = models.CharField(max_length=255, db_index=True, unique=True)
     url = models.CharField(max_length=255, null=True, blank=True)
     content = models.TextField(null=True, blank=True)
+    published = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ('-published', '-created')
+
+    def __unicode__(self):
+        return '<RssItem {}:{}:{}>'.format(self.rss.name, self.id, self.name)
