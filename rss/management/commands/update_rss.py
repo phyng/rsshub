@@ -9,5 +9,5 @@ class Command(BaseCommand):
     help = 'Update rss'
 
     def handle(self, *args, **options):
-        for rss in Rss.objects.all():
+        for rss in Rss.objects.filter(is_active=True):
             update_rss(rss)
