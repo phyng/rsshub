@@ -16,6 +16,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD_DIR = os.path.join(BASE_DIR, '_build')
 OUTPUT_DIR = os.path.join(BASE_DIR, '_output')
+KINDLEGEN_BIN_PATH = os.path.join(BASE_DIR, 'kindlegen')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/

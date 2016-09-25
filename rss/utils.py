@@ -14,7 +14,7 @@ from tools.template_tool import render_django_template
 
 
 OUTPUT_DIR = settings.OUTPUT_DIR
-BIN_PATH = os.path.join(settings.BASE_DIR, 'kindlegen')
+KINDLEGEN_BIN_PATH = settings.KINDLEGEN_BIN_PATH
 
 
 def render_and_write(template_name, context, output_name):
@@ -123,4 +123,4 @@ def build_mobi(rsses):
     render_and_write('mobi/opf.xml', wrap, 'daily.opf')
     for feed in data:
         render_and_write('mobi/feed.html', feed, '%s.html' % feed['number'])
-    os.system('{} {}'.format(BIN_PATH, os.path.join(OUTPUT_DIR, 'daily.opf')))
+    os.system('{} {}'.format(KINDLEGEN_BIN_PATH, os.path.join(OUTPUT_DIR, 'daily.opf')))
