@@ -17,7 +17,10 @@ from django.conf.urls import url
 from django.contrib import admin
 from rsshub.admin import admin_site
 
+import rss.views as rss_views
+
 
 urlpatterns = [
+    url(r'^$', rss_views.home_view),
     url(r'^admin/', admin_site.urls),
 ]

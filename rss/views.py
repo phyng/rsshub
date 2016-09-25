@@ -1,3 +1,8 @@
-from django.shortcuts import render
+# coding: utf-8
 
-# Create your views here.
+from __future__ import unicode_literals
+from django.shortcuts import redirect
+
+
+def home_view(request):
+    return redirect('/admin/')
