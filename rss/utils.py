@@ -14,6 +14,7 @@ from tools.template_tool import render_django_template
 
 
 OUTPUT_DIR = settings.OUTPUT_DIR
+LOCK_FILE = os.path.join(OUTPUT_DIR, 'LOCK')
 KINDLEGEN_BIN_PATH = settings.KINDLEGEN_BIN_PATH
 
 
@@ -81,6 +82,11 @@ def update_rss(rss):
 
 def build_mobi(rsses):
 
+    if os.path.exists(LOCK_FILE):
+        return
+
+    os.mknod(LOCK_FILE)
+
     data = []
     feed_number = 1
     play_order = 1
@@ -124,3 +130,5 @@ def build_mobi(rsses):
     for feed in data:
         render_and_write('mobi/feed.html', feed, '%s.html' % feed['number'])
     os.system('{} {}'.format(KINDLEGEN_BIN_PATH, os.path.join(OUTPUT_DIR, 'daily.opf')))
+
+    os.remove(LOCK_FILE)
