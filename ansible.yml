@@ -27,7 +27,21 @@
         dest: "{{ project_root }}/rsshub/server_settings.py"
         owner: root
         group: root
-        mode: "u=rx,g=r,o=r"
+        mode: "u=rw,g=r,o=r"
+
+    - name: copy rsshub.conf
+      copy:
+        src: "./rsshub.conf"
+        dest: "/etc/supervisor/conf.d/rsshub.conf"
+        owner: root
+        group: root
+        mode: "u=rw,g=r,o=r"
+
+    - name: migrate
+      command: "{{ project_root }}/env/bin/python {{ project_root }}/manage.py migrate"
+
+    - name: collectstatic
+      command: "{{ project_root }}/env/bin/python {{ project_root }}/manage.py collectstatic --noinput"
 
     - name: restart supervisor
-      supervisorctl: name=rsshub state=restarted config=./supervisord.conf
+      supervisorctl: name=rsshub state=restarted config=/etc/supervisor/supervisord.conf
