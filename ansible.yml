@@ -10,18 +10,6 @@
     port: 8002
   tasks:
 
-    - name: make sure nginx is running
-      service: name=nginx state=started
-
-    - name: make sure docker is running
-      service: name=docker state=started
-
-    - name: make sure docker-py is installed
-      pip: name=docker-py
-
-    - name: make sure httplib2 is installed
-      pip: name=httplib2
-
     - name: pull repo
       git:
         repo: https://github.com/phyng/rsshub.git
@@ -32,3 +20,14 @@
       pip:
         requirements: '{{ project_root }}/requirements.txt'
         virtualenv: '{{ project_root }}/env'
+
+    - name: copy server_settings
+      copy:
+        src: "./rsshub/server_settings.py"
+        dest: "{{ project_root }}/rsshub/server_settings.py"
+        owner: root
+        group: root
+        mode: "u=rx,g=r,o=r"
+
+    - name: restart supervisor
+      supervisorctl: name=rsshub state=restarted config=./supervisord.conf
