@@ -27,7 +27,7 @@ class RssAdmin(admin.ModelAdmin):
     @add_attr(short_description='Build mobi')
     def action_build_mobi(self, request, queryset):
         build_mobi(queryset)
-        send_file(['nkzxllg@gmail.com'], 'hello', settings.MOBI_PATH)
+        send_file(settings.TEST_EMAILS, 'hello', settings.MOBI_PATH)
         messages.success(request, 'Build mobi by {} rsses'.format(queryset.count()))
 
 
