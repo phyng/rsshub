@@ -5,3 +5,5 @@ kindlegen
 
 _output/
 env/
+
+rsshub/server_settings.py

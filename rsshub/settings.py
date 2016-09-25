@@ -125,3 +125,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+try:
+    from server_settings import *
+except ImportError:
+    raise Exception("Please provide server_settings.py")
