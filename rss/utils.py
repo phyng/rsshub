@@ -61,3 +61,5 @@ def update_rss(rss):
 
     if rssitems:
         RssItem.objects.bulk_create(rssitems)
+
+    return rssitems
