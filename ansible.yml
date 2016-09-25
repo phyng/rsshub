@@ -1,0 +1,34 @@
+
+---
+
+- hosts: do
+  remote_user: phyng
+  become: yes
+  vars:
+    git_version: "master"
+    project_root: "/home/phyng/project/rsshub"
+    port: 8002
+  tasks:
+
+    - name: make sure nginx is running
+      service: name=nginx state=started
+
+    - name: make sure docker is running
+      service: name=docker state=started
+
+    - name: make sure docker-py is installed
+      pip: name=docker-py
+
+    - name: make sure httplib2 is installed
+      pip: name=httplib2
+
+    - name: pull repo
+      git:
+        repo: https://github.com/phyng/rsshub.git
+        dest: "{{ project_root }}"
+        version: "{{ git_version }}"
+
+    - name: create virtualenv
+      pip:
+        requirements: '{{ project_root }}/requirements.txt'
+        virtualenv: '{{ project_root }}/env'
