@@ -16,6 +16,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD_DIR = os.path.join(BASE_DIR, '_build')
 OUTPUT_DIR = os.path.join(BASE_DIR, '_output')
+MOBI_PATH = os.path.join(OUTPUT_DIR, 'daily.mobi')
 KINDLEGEN_BIN_PATH = os.path.join(BASE_DIR, 'kindlegen')
 
 # Quick-start development settings - unsuitable for production
@@ -126,6 +127,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 
 
 try:

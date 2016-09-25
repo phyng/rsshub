@@ -3,10 +3,11 @@
 from __future__ import unicode_literals
 from django.contrib import admin
 from django.contrib import messages
+from django.conf import settings
 
 from rss.models import Rss, RssItem, RssCategory
 from tools.decorators import add_attr
-from .utils import update_rss, build_mobi
+from .utils import update_rss, build_mobi, send_file
 
 
 @admin.register(Rss)
@@ -26,6 +27,7 @@ class RssAdmin(admin.ModelAdmin):
     @add_attr(short_description='Build mobi')
     def action_build_mobi(self, request, queryset):
         build_mobi(queryset)
+        send_file(['nkzxllg@gmail.com'], 'hello', settings.MOBI_PATH)
         messages.success(request, 'Build mobi by {} rsses'.format(queryset.count()))
 
 

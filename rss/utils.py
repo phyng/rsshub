@@ -7,6 +7,7 @@ import datetime
 import feedparser
 from django.utils import timezone
 from django.conf import settings
+from django.core.mail import EmailMessage
 
 from .models import Rss, RssItem
 from tools.type_tool import has_list_key, has_str_key, has_dict_key
@@ -132,3 +133,16 @@ def build_mobi(rsses):
     os.system('{} {}'.format(KINDLEGEN_BIN_PATH, os.path.join(OUTPUT_DIR, 'daily.opf')))
 
     os.remove(LOCK_FILE)
+
+
+def send_file(to, subject, file_path):
+
+    email = EmailMessage(
+        subject,
+        subject,
+        settings.EMAIL_HOST_USER,
+        to,
+    )
+
+    email.attach_file(file_path)
+    email.send()
