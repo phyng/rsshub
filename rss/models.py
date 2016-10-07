@@ -31,7 +31,7 @@ class RssCategory(RssBase):
 
 class Rss(RssBase):
 
-    user = models.ManyToManyField(User, blank=True)
+    user = models.ManyToManyField(User, blank=True, through='RssUser')
     type = models.CharField(max_length=32, choices=RSS_TYPE_CHOICES)
     rsscategory = models.ForeignKey(RssCategory, null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=255)
@@ -41,6 +41,15 @@ class Rss(RssBase):
 
     def __unicode__(self):
         return '<RSS {}:{}>'.format(self.id, self.name)
+
+
+class RssUser(models.Model):
+
+    rss = models.ForeignKey(Rss, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    last_rssitem = models.ForeignKey('RssItem', null=True, blank=True, on_delete=models.SET_NULL)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
 
 class RssItem(RssBase):
