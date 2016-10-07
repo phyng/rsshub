@@ -2,7 +2,7 @@
 rsshub
 ======
 
-一个 rss 管理软件
+最后一个 rss 管理软件
 
 
 ## TODO

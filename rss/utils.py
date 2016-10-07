@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.core.mail import EmailMessage
 
-from .models import Rss, RssItem
+from .models import Rss, RssItem, RssUser
 from tools.type_tool import has_list_key, has_str_key, has_dict_key
 from tools.template_tool import render_django_template
 
@@ -99,12 +99,12 @@ def build_mobi(rsses):
             'number': feed_number,
             'play_order': play_order,
             'entries': [],
-            'title': feed.name,
+            'title': feed['rss'].name,
         }
 
         entry_number = 0
 
-        for entry in feed.rssitem_set.all():
+        for entry in feed['rssitems']:
             play_order += 1
             entry_number += 1
 
@@ -146,3 +146,30 @@ def send_file(to, subject, file_path):
 
     email.attach_file(file_path)
     email.send()
+
+
+def build_user_rss(user):
+
+    rssusers = RssUser.objects.filter(user=user)
+
+    rsses = []
+    for rssuser in rssusers:
+        rssitems = rssuser.rss.rssitem_set.all()
+        if rssuser.last_rssitem:
+            rssitems = rssitems.filter(id__gt=rssuser.last_rssitem_id)
+        rssitems = list(rssitems)
+        if rssitems:
+            rsses.append(dict(rssuser=rssuser, rss=rssuser.rss, rssitems=rssitems))
+
+    if rsses:
+        build_mobi(rsses)
+        for feed in rsses:
+            feed['rssuser'].last_rssitem_id = max([i.id for i in feed['rssitems']])
+            feed['rssuser'].save()
+
+        return rsses
+
+
+def send_user_file(user):
+    build_user_rss(user)
+    send_file(settings.TEST_EMAILS, 'hello', settings.MOBI_PATH)

@@ -35,7 +35,7 @@ class Rss(RssBase):
     type = models.CharField(max_length=32, choices=RSS_TYPE_CHOICES)
     rsscategory = models.ForeignKey(RssCategory, null=True, blank=True, on_delete=models.SET_NULL)
     name = models.CharField(max_length=255)
-    url = models.CharField(max_length=255, null=True, blank=True)
+    url = models.CharField(max_length=255, null=True, blank=True, unique=True)
     image = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
@@ -50,6 +50,9 @@ class RssUser(models.Model):
     last_rssitem = models.ForeignKey('RssItem', null=True, blank=True, on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = (('rss', 'user'), )
 
 
 class RssItem(RssBase):

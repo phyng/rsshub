@@ -7,10 +7,11 @@ from django.conf import settings
 
 from rss.models import Rss, RssItem, RssCategory, RssUser
 from tools.decorators import add_attr
-from .utils import update_rss, build_mobi, send_file
+from .utils import update_rss, build_mobi, send_file, send_user_file
 
 
 class RssUserInlineAdmin(admin.TabularInline):
+    raw_id_fields = ['last_rssitem', ]
     model = RssUser
     extra = 2
 
@@ -19,8 +20,8 @@ class RssUserInlineAdmin(admin.TabularInline):
 class RssAdmin(admin.ModelAdmin):
 
     list_display = ['name', 'url', 'created', 'updated']
-    inlines = (RssUserInlineAdmin, )
-    actions = ['action_update_rss', 'action_build_mobi']
+    inlines = [RssUserInlineAdmin, ]
+    actions = ['action_update_rss', 'action_build_mobi', 'action_send_mobi']
 
     @add_attr(short_description='Update Rss')
     def action_update_rss(self, request, queryset):
@@ -35,6 +36,11 @@ class RssAdmin(admin.ModelAdmin):
         build_mobi(queryset)
         send_file(settings.TEST_EMAILS, 'hello', settings.MOBI_PATH)
         messages.success(request, 'Build mobi by {} rsses'.format(queryset.count()))
+
+    @add_attr(short_description='Send user mobi')
+    def action_send_mobi(self, request, queryset):
+        send_user_file(request.user)
+        messages.success(request, 'Send user mobi success.'.format(queryset.count()))
 
 
 @admin.register(RssItem)
