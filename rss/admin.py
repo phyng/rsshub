@@ -5,15 +5,21 @@ from django.contrib import admin
 from django.contrib import messages
 from django.conf import settings
 
-from rss.models import Rss, RssItem, RssCategory
+from rss.models import Rss, RssItem, RssCategory, RssUser
 from tools.decorators import add_attr
 from .utils import update_rss, build_mobi, send_file
+
+
+class RssUserInlineAdmin(admin.TabularInline):
+    model = RssUser
+    extra = 2
 
 
 @admin.register(Rss)
 class RssAdmin(admin.ModelAdmin):
 
     list_display = ['name', 'url', 'created', 'updated']
+    inlines = (RssUserInlineAdmin, )
     actions = ['action_update_rss', 'action_build_mobi']
 
     @add_attr(short_description='Update Rss')
