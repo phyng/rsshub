@@ -2,12 +2,18 @@
 
 from __future__ import unicode_literals
 import os
+import uuid
 import time
 import datetime
+from PIL import Image
+import requests
 import feedparser
+from pyquery import PyQuery as pq
+
 from django.utils import timezone
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.utils.lru_cache import lru_cache
 
 from .models import Rss, RssItem, RssUser
 from tools.type_tool import has_list_key, has_str_key, has_dict_key
@@ -15,8 +21,11 @@ from tools.template_tool import render_django_template
 
 
 OUTPUT_DIR = settings.OUTPUT_DIR
+IMG_DIR = os.path.join(OUTPUT_DIR, 'img')
 LOCK_FILE = os.path.join(OUTPUT_DIR, 'LOCK')
 KINDLEGEN_BIN_PATH = settings.KINDLEGEN_BIN_PATH
+if not os.path.exists(IMG_DIR):
+    os.mkdir(IMG_DIR)
 
 
 def render_and_write(template_name, context, output_name):
@@ -81,6 +90,47 @@ def update_rss(rss):
     return rssitems
 
 
+@lru_cache(maxsize=None)
+def download_img(url):
+    r = requests.get(url, stream=True, timeout=10)
+    filename = str(uuid.uuid4())
+    path = os.path.join(IMG_DIR, filename)
+    if r.status_code == 200:
+        with open(path, 'wb') as f:
+            for chunk in r:
+                f.write(chunk)
+        try:
+            im = Image.open(path)
+            im.thumbnail((500, 500), Image.ANTIALIAS)
+            im = im.convert('L')
+            im.save(path + '.jpeg', "JPEG")
+        except IOError:
+            return
+        finally:
+            os.remove(path)
+
+        return 'img/{}.jpeg'.format(filename)
+
+
+def update_rss_coent(content):
+    if not content:
+        return content
+    try:
+        document = pq(content)
+    except ValueError:
+        return content
+
+    for img in document('img'):
+        src = img.attrib.get('src', '')
+        if src:
+            path = download_img(src)
+            if path:
+                img.attrib['src'] = path
+                img.attrib['middle'] = 'true'
+
+    return str(document)
+
+
 def build_mobi(rsses):
 
     if os.path.exists(LOCK_FILE):
@@ -112,7 +162,7 @@ def build_mobi(rsses):
                 'number': entry_number,
                 'play_order': play_order,
                 'title': entry.name,
-                'description': entry.content,
+                'description': update_rss_coent(entry.content),
             }
 
             local['entries'].append(local_entry)
