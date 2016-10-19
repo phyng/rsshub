@@ -201,6 +201,8 @@ def send_file(to, subject, file_path):
 def build_user_rss(user):
 
     rssusers = RssUser.objects.filter(user=user)
+    if not rssusers.exists():
+        return
 
     rsses = []
     for rssuser in rssusers:
