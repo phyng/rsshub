@@ -92,7 +92,10 @@ def update_rss(rss):
 
 @lru_cache(maxsize=None)
 def download_img(url):
-    r = requests.get(url, stream=True, timeout=10)
+    try:
+        r = requests.get(url, stream=True, timeout=10)
+    except requests.exceptions.Timeout:
+        return
     filename = str(uuid.uuid4())
     path = os.path.join(IMG_DIR, filename)
     if r.status_code == 200:
@@ -207,8 +210,16 @@ def build_user_rss(user):
     rsses = []
     for rssuser in rssusers:
         rssitems = rssuser.rss.rssitem_set.all()
+        """
         if rssuser.last_rssitem:
             rssitems = rssitems.filter(id__gt=rssuser.last_rssitem_id)
+        """
+        yestoday = datetime.date.today() - datetime.timedelta(days=1)
+        rssitems = rssitems.filter(
+            published__year=yestoday.year,
+            published__month=yestoday.month,
+            published__day=yestoday.day,
+        )
         rssitems = list(rssitems)
         if rssitems:
             rsses.append(dict(rssuser=rssuser, rss=rssuser.rss, rssitems=rssitems))
