@@ -94,7 +94,7 @@ def update_rss(rss):
 def download_img(url):
     try:
         r = requests.get(url, stream=True, timeout=10)
-    except requests.exceptions.Timeout:
+    except Exception:
         return
     filename = str(uuid.uuid4())
     path = os.path.join(IMG_DIR, filename)
