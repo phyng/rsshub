@@ -126,7 +126,10 @@ def update_rss_coent(content):
     for img in document('img'):
         src = img.attrib.get('src', '')
         if src:
-            path = download_img(src)
+            try:
+                path = download_img(src)
+            except Exception:
+                continue
             if path:
                 img.attrib['src'] = path
                 img.attrib['middle'] = 'true'
